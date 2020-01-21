@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SalesWebMvc.Services;
+using SalesWebMvc.Models;
 
 namespace SalesWebMvc.Controllers
 {
@@ -20,6 +21,17 @@ namespace SalesWebMvc.Controllers
             var list = _sellersService.FinAll();
             return View(list);
         }
+        public IActionResult Create()
+        {
+            return View();
+        }
 
+        [HttpPost] //anotação para indicar este método é post
+        [ValidateAntiForgeryToken] //anotação para evitar ataques csrf
+        public  IActionResult Create(Seller seller)
+        {
+            _sellersService.Insert(seller);
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
