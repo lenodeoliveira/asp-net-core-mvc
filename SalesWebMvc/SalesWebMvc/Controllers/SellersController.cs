@@ -20,40 +20,40 @@ namespace SalesWebMvc.Controllers
             _sellersService = sellerService;
             _departmentService = departmentService;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var list = _sellersService.FinAll();
+            var list = await _sellersService.FinAllAsync();
             return View(list);
         }
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            var departments = _departmentService.FinAll();
+            var departments = await _departmentService.FinAllAsync();
             var viewModel = new SellerFormViewModel { Departments = departments };
             return View(viewModel);
         }
 
         [HttpPost] //anotação para indicar este método é post
         [ValidateAntiForgeryToken] //anotação para evitar ataques csrf
-        public  IActionResult Create(Seller seller)
+        public async Task<IActionResult> Create(Seller seller)
         {
             if (!ModelState.IsValid)
             {
-                var department = _departmentService.FinAll();
+                var department = await _departmentService.FinAllAsync();
                 var viewModel = new SellerFormViewModel { Seller = seller, Departments = department };
                 return View(viewModel);
             }
-            _sellersService.Insert(seller);
+            await _sellersService.InsertAsync(seller);
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if(id == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not provided" });
             }
 
-            var obj = _sellersService.FindById(id.Value);//devemos colocar .Value por se tratar de um valor opcional
+            var obj = await _sellersService.FindByIdAsync(id.Value);//devemos colocar .Value por se tratar de um valor opcional
 
             if(obj == null)
             {
@@ -64,21 +64,21 @@ namespace SalesWebMvc.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            _sellersService.Remove(id);
+            await _sellersService.RemoveAsync(id);
             return RedirectToAction(nameof(Index));
 
         }
 
-        public IActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not provided" });
             }
 
-            var obj = _sellersService.FindById(id.Value);//devemos colocar .Value por se tratar de um valor opcional
+            var obj = await _sellersService.FindByIdAsync(id.Value);//devemos colocar .Value por se tratar de um valor opcional
 
             if (obj == null)
             {
@@ -87,31 +87,31 @@ namespace SalesWebMvc.Controllers
 
             return View(obj);
         }
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if(id == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not provided" });
             }
 
-            var obj = _sellersService.FindById(id.Value);
+            var obj = await _sellersService.FindByIdAsync(id.Value);
 
             if(obj == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
-            List<Department> departments = _departmentService.FinAll();
+            List<Department> departments = await _departmentService.FinAllAsync();
             SellerFormViewModel viewModel = new SellerFormViewModel { Seller = obj, Departments = departments };
             return View(viewModel);
         }
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Seller seller) 
+        public async Task<IActionResult> Edit(int id, Seller seller) 
         {
             if (!ModelState.IsValid)
             {
-                var department = _departmentService.FinAll();
+                var department = await _departmentService.FinAllAsync();
                 var viewModel = new SellerFormViewModel { Seller = seller, Departments = department };
                 return View(viewModel);
             }
@@ -122,7 +122,7 @@ namespace SalesWebMvc.Controllers
 
             try
             {
-                _sellersService.Update(seller);
+                await _sellersService.UpdateAsync(seller);
                 return RedirectToAction(nameof(Index));
             }
             catch(ApplicationException e)
